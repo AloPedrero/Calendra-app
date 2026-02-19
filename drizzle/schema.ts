@@ -1,4 +1,4 @@
-import { DAYS_OF_WEEK_IN_ORDER } from "@constants";
+import { DAYS_OF_WEEK_IN_ORDER } from "@/constants";
 import { relations } from "drizzle-orm";
 import { pgTable, boolean, integer, text, uuid, timestamp, index, pgEnum } from "drizzle-orm/pg-core";
 
