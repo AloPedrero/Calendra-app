@@ -32,8 +32,6 @@ export async function createEvent(
     } finally {
         // Revalidate the '/events' path to ensure the page fetches fresh data after the database operation
        revalidatePath('/events')
-       // Redirect the user to the events 
-       redirect('/events')
     }
 }
 
@@ -101,7 +99,5 @@ export async function deleteEvent(
         } finally {
             // Revalidate the '/events' path to ensure the page fetches fresh data after the database operation
         revalidatePath('/events')
-        // Redirect the user to the events 
-        redirect('/events')
         }
     }
