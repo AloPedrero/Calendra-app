@@ -31,6 +31,7 @@ export default function EventForm({event,}:{
         // 2. `startDeleteTransition` - This is a function we can use to start the async operation, like deleting an event
 
         const [isDeletePending, startDeleteTransition] = useTransition()
+        const router = useRouter()
 
         const form = useForm<z.infer<typeof eventFormSchema>>({
             resolver: zodResolver(eventFormSchema),
@@ -42,6 +43,20 @@ export default function EventForm({event,}:{
             name: ''                   // Ensure controlled input: default to empty string
             }
         })
+
+        //Handle form submition
+        async function onSubmit(values: z.infer<typeof eventFormSchema>) {
+            const action = event == null ? createEvent : updateEvent.bind(null, event.id)
+            try {
+                await action(values)
+                router.push('/events')
+            } catch (error: any){
+                // Handle any error that occurs during the action (e.g., network error)
+                form.setError("root", {
+                    message: `There was an error saving your event ${error.message}`
+                })
+            }
+        }
 
         return(
             <Form {...form}>

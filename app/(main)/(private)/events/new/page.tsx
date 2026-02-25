@@ -1,3 +1,4 @@
+import EventForm from "@/components/forms/EventForm";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 export default function NewEventPage() {
