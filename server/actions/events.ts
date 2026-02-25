@@ -141,3 +141,4 @@ export async function getEvent(userId: string, eventId: string): Promise<EventRo
 // It removes the generic 'isActive' field and replaces it with a literal true
 export type PublicEvent = Omit<EventRow, "isActive"> & { isActive: true }
 // “This version of an event is guaranteed to be active — no maybe, no false.”
+
