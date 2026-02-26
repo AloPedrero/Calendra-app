@@ -35,12 +35,12 @@ export const ScheduleTable = pgTable(
 
 //Define relationships for ScheduleTable: a schedule has many availabilities
 export const scheduleRelations = relations(ScheduleTable,
-    ({many}) => ({availabilities: many(scheduleAvailabilityTable)})
+    ({many}) => ({availabilities: many(ScheduleAvailabilityTable)})
 )
 
     export const scheduleDayOfWeekEnum = pgEnum("day", DAYS_OF_WEEK_IN_ORDER)
 
-export const scheduleAvailabilityTable = pgTable(
+export const ScheduleAvailabilityTable = pgTable(
     "scheduleAvailabilties",
     {
         id: uuid("id").primaryKey().defaultRandom(),
@@ -56,10 +56,10 @@ export const scheduleAvailabilityTable = pgTable(
 
 //Define reverse relation each availability belongs to a schedule
 export const scheduleAvailabilityRalations = relations(
-    scheduleAvailabilityTable,
+    ScheduleAvailabilityTable,
     ({one}) => ({
         schedule: one(ScheduleTable, {
-            fields: [scheduleAvailabilityTable.scheduleId], //local key
+            fields: [ScheduleAvailabilityTable.scheduleId], //local key
             references: [ScheduleTable.id]// foreign key
         }
 

@@ -7,9 +7,11 @@
 // displaying a title and a `ScheduleForm` component populated with the user's schedule.
 // This allows the user to view and possibly manage their schedule on the page.
 
+import { ScheduleForm } from "@/components/forms/ScheduleForm"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { getSchedule } from "@/server/actions/schedule"
 import { auth } from "@clerk/nextjs/server"
+
 
 //Default export function for the schedulepage component
 export default async function SchedulePage() {
