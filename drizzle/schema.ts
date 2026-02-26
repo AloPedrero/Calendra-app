@@ -27,7 +27,7 @@ export const ScheduleTable = pgTable(
     {
         id: uuid("id").primaryKey().defaultRandom(), // creates a id as a uuid, sets as a primary key and fills it qith default random value generated with the uuid
         timezone: text("timezone").notNull(),
-        clerkUserId: text("clerkUserId").notNull(),
+        clerkUserId: text("clerkUserId").notNull().unique(),
         createdAt,
         updatedAt
     }
