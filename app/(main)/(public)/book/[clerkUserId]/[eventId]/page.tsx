@@ -1,4 +1,8 @@
+import NoTimeSlots from "@/components/NoTimeSlots";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getEvent } from "@/server/actions/events";
+import { getValidTimesFromSchedule } from "@/server/actions/schedule";
+import { clerkClient } from "@clerk/nextjs/server";
 import {
   addYears,
   eachMinuteOfInterval,
@@ -23,6 +27,10 @@ export default async function BookingPage(
       </div>
     )
 
+    //Get the full user object from Clerk
+      const client = await clerkClient()
+      const calendarUser = await client.users.getUser(clerkUserId)
+
     // Define a date range from now (rounded up to the nearest 15 minutes) to 1 year later
     const startDate = roundToNearestMinutes(new Date(), {
       nearestTo: 15,
@@ -34,5 +42,31 @@ export default async function BookingPage(
      // Generate valid available time slots for the event using the custom scheduler logic
     const validTimes = await getValidTimesFromSchedule(
         eachMinuteOfInterval({ start: startDate, end: endDate }, { step: 15 }), event)
+
+    // If no valid time slots are available, show a message and an option to pick another event
+    if (validTimes.length === 0) {
+        return <NoTimeSlots event={event} calendarUser={calendarUser} />
+    }
     
+    // Render the booking form with the list of valid available times
+    return (
+        <Card className="max-w-4xl mx-auto border-8 border-blue-200 shadow-2xl shadow-accent-foreground">
+        <CardHeader>
+            <CardTitle>
+            Book {event.name} with {calendarUser.fullName}
+            </CardTitle>
+            {event.description && (
+            <CardDescription>{event.description}</CardDescription>
+            )}
+        </CardHeader>
+        <CardContent>
+            <MeetingForm
+            validTimes={validTimes}
+            eventId={event.id}
+            clerkUserId={clerkUserId}
+            />
+        </CardContent>
+        </Card>
+    )   
+
 }
