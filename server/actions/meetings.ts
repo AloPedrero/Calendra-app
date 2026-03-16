@@ -5,7 +5,7 @@ import { meetingActionSchema } from "@/schema/meetings";
 import { fromZonedTime } from "date-fns-tz";
 import z from "zod";
 import { getValidTimesFromSchedule } from "./schedule";
-import { createCalendarEvent } from "../google/googleCalendar";
+import { CalendarRegistration, createCalendarEvent } from "../google/googleCalendar";
 
 export async function createMeeting(
     unsafeData: z.infer<typeof meetingActionSchema> // Incoming data, inferred from the meetingActionSchema
@@ -45,13 +45,15 @@ export async function createMeeting(
       throw new Error("Selected time is not valid.");
     }
 
-    // Create the Google Calendar event with all necessary details
-    await createCalendarEvent({
+    const calendarRegistration: CalendarRegistration = {
       ...data, // guest info, timezone, etc.
       startTime: startInTimezone, // adjusted to the right timezone
       durationInMinutes: event.durationInMinutes, // use duration from the event
       eventName: event.name, // use event name from DB
-    });
+    }
+
+    // Create the Google Calendar event with all necessary details
+    await createCalendarEvent(calendarRegistration);
     return {clerkUserId: data.clerkUserId, eventId : data.eventId, startTime: data.startTime}
   } catch (error: any) {
     // Log the error message (or handle it based on your need)
