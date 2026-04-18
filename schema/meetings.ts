@@ -1,5 +1,5 @@
-import { startOfDay } from "date-fns"
-import { z } from "zod"
+import { startOfDay } from "date-fns";
+import { z } from "zod";
 
 // Base schema used for both creating and processing a meeting
 const meetingSchemaBase = z.object({
@@ -17,7 +17,7 @@ const meetingSchemaBase = z.object({
 
   // 'timezone' must be a non-empty string (e.g., "UTC", "America/New_York", etc.)
   timezone: z.string().min(1, "Required"),
-})
+});
 
 // Schema for validating the meeting form input
 export const meetingFormSchema = z
@@ -26,7 +26,7 @@ export const meetingFormSchema = z
     date: z.date().min(startOfDay(new Date()), "Must be in the future"),
   })
   // Combine it with the shared base schema fields
-  .merge(meetingSchemaBase)
+  .merge(meetingSchemaBase);
 
 // Schema for handling a meeting action, like saving it to the database
 export const meetingActionSchema = z
@@ -38,4 +38,4 @@ export const meetingActionSchema = z
     clerkUserId: z.string().min(1, "Required"),
   })
   // Combine with the base schema to include time, guest info, and timezone
-  .merge(meetingSchemaBase)
+  .merge(meetingSchemaBase);

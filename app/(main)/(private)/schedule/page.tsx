@@ -7,29 +7,28 @@
 // displaying a title and a `ScheduleForm` component populated with the user's schedule.
 // This allows the user to view and possibly manage their schedule on the page.
 
-import { ScheduleForm } from "@/components/forms/ScheduleForm"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { getSchedule } from "@/server/actions/schedule"
-import { auth } from "@clerk/nextjs/server"
-
+import { ScheduleForm } from "@/components/forms/ScheduleForm";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { getSchedule } from "@/server/actions/schedule";
+import { auth } from "@clerk/nextjs/server";
 
 //Default export function for the schedulepage component
 export default async function SchedulePage() {
-    //check if the user is signed in, if not redirect to sign in page using clerk auth
-    const { userId, redirectToSignIn } = await auth()
-    if (userId == null) return redirectToSignIn()
-    
-    const schedule = await getSchedule(userId)
+  //check if the user is signed in, if not redirect to sign in page using clerk auth
+  const { userId, redirectToSignIn } = await auth();
+  if (userId == null) return redirectToSignIn();
 
-    return(
-        <Card className="max-w-md mx-auto border-8 border-blue-200 shadow-2xl shadow-accent-foreground">
-            <CardHeader>
-                <CardTitle>Schedule</CardTitle> {/* Display title for the page */}
-            </CardHeader>
-            <CardContent>
-                <ScheduleForm schedule={schedule} /> 
-                {/* Render the ScheduleForm component with the fetched schedule */}
-            </CardContent>
-        </Card>
-    )
+  const schedule = await getSchedule(userId);
+
+  return (
+    <Card className="max-w-md mx-auto border-8 border-blue-200 shadow-2xl shadow-accent-foreground">
+      <CardHeader>
+        <CardTitle>Schedule</CardTitle> {/* Display title for the page */}
+      </CardHeader>
+      <CardContent>
+        <ScheduleForm schedule={schedule} />
+        {/* Render the ScheduleForm component with the fetched schedule */}
+      </CardContent>
+    </Card>
+  );
 }

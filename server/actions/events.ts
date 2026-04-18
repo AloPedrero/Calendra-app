@@ -1,4 +1,4 @@
-'use server'
+"use server";
 import { db } from "@/drizzle/db";
 import { EventTable } from "@/drizzle/schema";
 import { eventFormSchema } from "@/schema/events";
@@ -8,106 +8,110 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
- //marks this file as a server action
+//marks this file as a server action
 
 //this function creates a new event in the database after validating th input data
 
 export async function createEvent(
-    unsafeData: z.infer<typeof eventFormSchema>): Promise<void> {
-    try {
-        //Authenticate the user using Clerk
-        const {userId} = await auth()
-        //Validate the incoming data against the event form schema
-        const {success, data} = eventFormSchema.safeParse(unsafeData)
-        if (!success || !userId) {
-            throw new Error ("Invaid event data or user not authenticated.")
-        }
-
-        //insert the validated event data into the database, linking it to the autenthicated user
-        await db.insert(EventTable).values({...data, clerkUserId: userId})
-        
-    } catch (error: any) {
-        //If any error ocurss during the process, thorw a message with the new wrror
-        throw new Error (`Failed to create event: ${error.message || error}`)
-    } finally {
-        // Revalidate the '/events' path to ensure the page fetches fresh data after the database operation
-       revalidatePath('/events')
+  unsafeData: z.infer<typeof eventFormSchema>,
+): Promise<void> {
+  try {
+    //Authenticate the user using Clerk
+    const { userId } = await auth();
+    //Validate the incoming data against the event form schema
+    const { success, data } = eventFormSchema.safeParse(unsafeData);
+    if (!success || !userId) {
+      throw new Error("Invaid event data or user not authenticated.");
     }
+
+    //insert the validated event data into the database, linking it to the autenthicated user
+    await db.insert(EventTable).values({ ...data, clerkUserId: userId });
+  } catch (error: any) {
+    //If any error ocurss during the process, thorw a message with the new wrror
+    throw new Error(`Failed to create event: ${error.message || error}`);
+  } finally {
+    // Revalidate the '/events' path to ensure the page fetches fresh data after the database operation
+    revalidatePath("/events");
+  }
 }
 
 export async function updateEvent(
-    id: string, //ID of the updating event
-    unsafeData: z.infer<typeof eventFormSchema>): Promise<void> {
-        try {
-        // Authenticate the user
-        const { userId } = await auth()
-    
-        // Validate the incoming data against the event form schema
-        const { success, data } = eventFormSchema.safeParse(unsafeData)
-    
-        // If validation fails or the user is not authenticated, throw an error
-        if (!success || !userId) {
-            throw new Error("Invalid event data or user not authenticated.")
-        }
-    
-        // Attempt to update the event in the database
-        const { rowCount } = await db
-            .update(EventTable)
-            .set({ ...data }) // Update with validated data
-            .where(and(eq(EventTable.id, id), eq(EventTable.clerkUserId, userId))) // Ensure user owns the event
-    
-        // If no event was updated (either not found or not owned by the user), throw an error
-        if (rowCount === 0) {
-            throw new Error("Event not found or user not authorized to update this event.")
-        }
-    
-        } catch (error: any) {
-            //If any error ocurss during the process, thorw a message with the new wrror
-            throw new Error (`Failed to create event: ${error.message || error}`)
-        } finally {
-            // Revalidate the '/events' path to ensure the page fetches fresh data after the database operation
-        revalidatePath('/events')
-        // Redirect the user to the events 
-        redirect('/events')
-        }
+  id: string, //ID of the updating event
+  unsafeData: z.infer<typeof eventFormSchema>,
+): Promise<void> {
+  try {
+    // Authenticate the user
+    const { userId } = await auth();
+
+    // Validate the incoming data against the event form schema
+    const { success, data } = eventFormSchema.safeParse(unsafeData);
+
+    // If validation fails or the user is not authenticated, throw an error
+    if (!success || !userId) {
+      throw new Error("Invalid event data or user not authenticated.");
     }
+
+    // Attempt to update the event in the database
+    const { rowCount } = await db
+      .update(EventTable)
+      .set({ ...data }) // Update with validated data
+      .where(and(eq(EventTable.id, id), eq(EventTable.clerkUserId, userId))); // Ensure user owns the event
+
+    // If no event was updated (either not found or not owned by the user), throw an error
+    if (rowCount === 0) {
+      throw new Error(
+        "Event not found or user not authorized to update this event.",
+      );
+    }
+  } catch (error: any) {
+    //If any error ocurss during the process, thorw a message with the new wrror
+    throw new Error(`Failed to create event: ${error.message || error}`);
+  } finally {
+    // Revalidate the '/events' path to ensure the page fetches fresh data after the database operation
+    revalidatePath("/events");
+    // Redirect the user to the events
+    redirect("/events");
+  }
+}
 
 export async function deleteEvent(
-    id: string, //ID of the updating event
-    ): Promise<void> {
-        try {
-            // Authenticate the user
-            const { userId } = await auth()
-    
-            // Throw an error if no authenticated user
-            if (!userId) {
-            throw new Error("User not authenticated.")
-            }
-        
-            // Attempt to delete the event only if it belongs to the authenticated user
-            const { rowCount } = await db
-            .delete(EventTable)
-            .where(and(eq(EventTable.id, id), eq(EventTable.clerkUserId, userId)))
-        
-            // If no event was deleted (either not found or not owned by user), throw an error
-            if (rowCount === 0) {
-            throw new Error("Event not found or user not authorized to delete this event.")
-        }
-        } catch (error: any) {
-            //If any error ocurss during the process, thorw a message with the new wrror
-            throw new Error (`Failed to create event: ${error.message || error}`)
-        } finally {
-            // Revalidate the '/events' path to ensure the page fetches fresh data after the database operation
-        revalidatePath('/events')
-        }
+  id: string, //ID of the updating event
+): Promise<void> {
+  try {
+    // Authenticate the user
+    const { userId } = await auth();
+
+    // Throw an error if no authenticated user
+    if (!userId) {
+      throw new Error("User not authenticated.");
     }
 
-    //Infer the type of a row from the EvenTable schema
-    type EventRow = typeof EventTable.$inferSelect
+    // Attempt to delete the event only if it belongs to the authenticated user
+    const { rowCount } = await db
+      .delete(EventTable)
+      .where(and(eq(EventTable.id, id), eq(EventTable.clerkUserId, userId)));
+
+    // If no event was deleted (either not found or not owned by user), throw an error
+    if (rowCount === 0) {
+      throw new Error(
+        "Event not found or user not authorized to delete this event.",
+      );
+    }
+  } catch (error: any) {
+    //If any error ocurss during the process, thorw a message with the new wrror
+    throw new Error(`Failed to create event: ${error.message || error}`);
+  } finally {
+    // Revalidate the '/events' path to ensure the page fetches fresh data after the database operation
+    revalidatePath("/events");
+  }
+}
+
+//Infer the type of a row from the EvenTable schema
+type EventRow = typeof EventTable.$inferSelect;
 
 // Async function to fetch all events (active and inactive) for a specific user
-export async function getEvents(clerkUserId:string): Promise<EventRow[]> {
-    // Query the database for events where the clerkUserId matches
+export async function getEvents(clerkUserId: string): Promise<EventRow[]> {
+  // Query the database for events where the clerkUserId matches
   const events = await db.query.EventTable.findMany({
     //where: — This defines a filter (a WHERE clause) for your query.
 
@@ -120,29 +124,34 @@ export async function getEvents(clerkUserId:string): Promise<EventRow[]> {
 
     // Events are ordered alphabetically (case-insensitive) by name
     orderBy: ({ name }, { asc, sql }) => asc(sql`lower(${name})`),
-  })
+  });
 
-    // Return the full list of events
-    return events
+  // Return the full list of events
+  return events;
 }
 
 // Fetch a specific event for a given user
-export async function getEvent(userId: string, eventId: string): Promise<EventRow | undefined> {
+export async function getEvent(
+  userId: string,
+  eventId: string,
+): Promise<EventRow | undefined> {
   const event = await db.query.EventTable.findFirst({
     where: ({ id, clerkUserId }, { and, eq }) =>
       and(eq(clerkUserId, userId), eq(id, eventId)), // Make sure the event belongs to the user
-  })
+  });
 
-  return event ?? undefined // Explicitly return undefined if not found
+  return event ?? undefined; // Explicitly return undefined if not found
 }
 
 // Define a new type for public events, which are always active
 // It removes the generic 'isActive' field and replaces it with a literal true
-export type PublicEvent = Omit<EventRow, "isActive"> & { isActive: true }
+export type PublicEvent = Omit<EventRow, "isActive"> & { isActive: true };
 // “This version of an event is guaranteed to be active — no maybe, no false.”
 
 // Async function to fetch all active (public) events for a specific user
-export async function getPublicEvents(clerkUserId: string): Promise<PublicEvent[]> {
+export async function getPublicEvents(
+  clerkUserId: string,
+): Promise<PublicEvent[]> {
   // Query the database for events where:
   // - the clerkUserId matches
   // - the event is marked as active
@@ -151,8 +160,8 @@ export async function getPublicEvents(clerkUserId: string): Promise<PublicEvent[
     where: ({ clerkUserId: userIdCol, isActive }, { eq, and }) =>
       and(eq(userIdCol, clerkUserId), eq(isActive, true)),
     orderBy: ({ name }, { asc, sql }) => asc(sql`lower(${name})`),
-  })
+  });
 
   // Cast the result to the PublicEvent[] type to indicate all are active
-  return events as PublicEvent[]
+  return events as PublicEvent[];
 }

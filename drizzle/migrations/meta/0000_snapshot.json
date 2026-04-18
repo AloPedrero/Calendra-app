@@ -190,12 +190,8 @@
           "name": "scheduleAvailabilties_scheduleId_schedules_id_fk",
           "tableFrom": "scheduleAvailabilties",
           "tableTo": "schedules",
-          "columnsFrom": [
-            "scheduleId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["scheduleId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
