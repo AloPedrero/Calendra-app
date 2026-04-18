@@ -151,7 +151,10 @@ export async function createCalendarEvent(
       sendUpdates: "all", // Send email notifications to all attendees of the event.
       requestBody: {
         attendees: [
-          { email: calendarRegistration.guestEmail, displayName: calendarRegistration.guestName }, // Add the guest to the attendees list.
+          {
+            email: calendarRegistration.guestEmail,
+            displayName: calendarRegistration.guestName,
+          }, // Add the guest to the attendees list.
           {
             email: primaryEmail.emailAddress, // Add the user themselves as an attendee.
             displayName: `${calendarUser.firstName} ${calendarUser.lastName}`, // Display name for the user.
@@ -165,7 +168,10 @@ export async function createCalendarEvent(
           dateTime: calendarRegistration.startTime.toISOString(), // Start time of the event.
         },
         end: {
-          dateTime: addMinutes(calendarRegistration.startTime, calendarRegistration.durationInMinutes).toISOString(), // Calculate the end time based on the duration.
+          dateTime: addMinutes(
+            calendarRegistration.startTime,
+            calendarRegistration.durationInMinutes,
+          ).toISOString(), // Calculate the end time based on the duration.
         },
         summary: `${calendarRegistration.guestName} + ${calendarUser.firstName} ${calendarUser.lastName}: ${calendarRegistration.eventName}`, // Title of the event, including the guest and user names.
       },

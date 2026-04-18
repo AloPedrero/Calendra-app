@@ -1,16 +1,19 @@
-'use server'
+"use server";
 
 import { db } from "@/drizzle/db";
 import { meetingActionSchema } from "@/schema/meetings";
 import { fromZonedTime } from "date-fns-tz";
 import z from "zod";
 import { getValidTimesFromSchedule } from "./schedule";
-import { CalendarRegistration, createCalendarEvent } from "../google/googleCalendar";
+import {
+  CalendarRegistration,
+  createCalendarEvent,
+} from "../google/googleCalendar";
 
 export async function createMeeting(
-    unsafeData: z.infer<typeof meetingActionSchema> // Incoming data, inferred from the meetingActionSchema
+  unsafeData: z.infer<typeof meetingActionSchema>, // Incoming data, inferred from the meetingActionSchema
 ) {
-    try {
+  try {
     // Validate the incoming data against the schema
     const { success, data } = meetingActionSchema.safeParse(unsafeData);
 
@@ -25,7 +28,7 @@ export async function createMeeting(
         and(
           eq(isActive, true), // Event must be active
           eq(clerkUserId, data.clerkUserId), // Belonging to the right user
-          eq(id, data.eventId) // Matching the event ID
+          eq(id, data.eventId), // Matching the event ID
         ),
     });
 
@@ -38,7 +41,10 @@ export async function createMeeting(
     const startInTimezone = fromZonedTime(data.startTime, data.timezone);
 
     // Check if the selected time is valid for the event's availability
-    const validTimes = await getValidTimesFromSchedule([startInTimezone], event);
+    const validTimes = await getValidTimesFromSchedule(
+      [startInTimezone],
+      event,
+    );
 
     // If the selected time is not valid, throw an error
     if (validTimes.length === 0) {
@@ -50,11 +56,15 @@ export async function createMeeting(
       startTime: startInTimezone, // adjusted to the right timezone
       durationInMinutes: event.durationInMinutes, // use duration from the event
       eventName: event.name, // use event name from DB
-    }
+    };
 
     // Create the Google Calendar event with all necessary details
     await createCalendarEvent(calendarRegistration);
-    return {clerkUserId: data.clerkUserId, eventId : data.eventId, startTime: data.startTime}
+    return {
+      clerkUserId: data.clerkUserId,
+      eventId: data.eventId,
+      startTime: data.startTime,
+    };
   } catch (error: any) {
     // Log the error message (or handle it based on your need)
     console.error(`Error creating meeting: ${error.message || error}`);

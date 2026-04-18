@@ -46,7 +46,7 @@
   --radius-4xl: calc(var(--radius) + 16px);
 }
 
-@theme{
+@theme {
   --animate-fade-in: fade-in-scale 0.3s ease-out;
 
   @keyframes fade-in-scale {
